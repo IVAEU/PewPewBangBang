@@ -1,15 +1,28 @@
+using System.Collections.Generic;
 using UnityEngine;
 using State;
 
 namespace State
 {
-    [System.Serializable]
-    public class Context<TController, TStateData> 
-        where TController : Controller 
-        where TStateData : StateData<TController>
+    public enum SubStateType
     {
-        public TStateData CurrentState;
-        public TStateData[] States;
+        Locomotion, //이동
+        Behavior //행동
+    }
+
+    public enum StateType : uint
+    {
+        Idle,
+        Move,
+        Attack,
+        Skill
+    }
+    
+    [System.Serializable]
+    public class Context<TController> where TController : IController 
+    {
+        public Dictionary<SubStateType, IState<TController>> CurrentState = new();
+        public Dictionary<SubStateType, Dictionary<StateType, IState<TController>>> States = new();
         
         protected TController Controller;
 
@@ -17,27 +30,42 @@ namespace State
         {
             Controller = c;
         }
-        
-        public void TransitionToState(TStateData state) 
+
+        public void AddState(SubStateType subState, StateType type, IState<TController> state)
         {
-            if (CurrentState)
-                CurrentState.OnExit(Controller);
-            CurrentState = state;
-            CurrentState.OnEnter(Controller);
-        }
-        
-        public void SearchNextState(TController controller)
-        {
-            foreach (var state in States)
+            if (States.TryGetValue(subState, out var detailSubState))
             {
-                if (state.IsPlayable(controller))
+                if (detailSubState.TryGetValue(type, out _))
                 {
-                    TransitionToState(state);
-                    return;
+                    detailSubState[type] = state;
+                }
+                else
+                {
+                    detailSubState.Add(type, state);
                 }
             }
+            else
+            {
+                States.Add(subState, new Dictionary<StateType, IState<TController>>());
+                States[subState].Add(type, state);
+            }
+        }
         
-            TransitionToState(States[^1]);
+        public void ChangeState(SubStateType subState, StateType type) 
+        {
+            if (CurrentState.TryGetValue(subState, out _))
+            {
+                Debug.Log($"State Changed. {subState}: {CurrentState[subState]} -> {States[subState][type]}");
+                CurrentState[subState].OnExit(Controller);
+                CurrentState[subState] = States[subState][type];
+            }
+            else
+            {
+                Debug.Log($"State Setted. {subState}: {States[subState][type]}");
+                CurrentState.Add(subState, States[subState][type]);
+            }
+            
+            CurrentState[subState].OnEnter(Controller);
         }
     }
 }

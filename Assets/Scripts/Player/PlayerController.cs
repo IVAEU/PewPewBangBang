@@ -1,29 +1,37 @@
 using System;
+using System.Linq;
 using State;
 using UnityEngine;
 
-public class PlayerController : Controller
+public class PlayerController : MonoBehaviour, IController
 {
+    public ShipData Data;
     public PlayerInput Input;
     public Rigidbody2D Rigid2D;
 
-    [field:SerializeField] public Context<PlayerController, StateData<PlayerController>> Context { get; private set; }
+    [field: SerializeField]
+    public Context<PlayerController> Context { get; private set; }
 
     private void Start()
     {
-        Context = new Context<PlayerController, StateData<PlayerController>>();
+        Input = GetComponent<PlayerInput>();
+        Rigid2D = GetComponent<Rigidbody2D>();
+        Context = new Context<PlayerController>();
         Context.Init(this);
+        Context.AddState(SubStateType.Locomotion, StateType.Idle, new SPL_Idle());
+        Context.AddState(SubStateType.Locomotion, StateType.Move, new SPL_Move());
+        Context.AddState(SubStateType.Behavior, StateType.Idle, new SPB_Idle());
+        Context.AddState(SubStateType.Behavior, StateType.Attack, new SPB_Shoot());
 
-        Context.SearchNextState(this);
+        Context.ChangeState(SubStateType.Locomotion, StateType.Idle);
+        Context.ChangeState(SubStateType.Behavior, StateType.Idle);
     }
 
     private void Update()
     {
-        Context.CurrentState?.OnProcessing(this);
-    }
-
-    public void UpdateNextState()
-    {
-        Context.SearchNextState(this);
+        foreach (var state in Context.CurrentState.ToList())
+        {
+            state.Value.OnProcessing(this);
+        }
     }
 }

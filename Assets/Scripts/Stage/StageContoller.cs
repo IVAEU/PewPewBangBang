@@ -1,9 +1,6 @@
 using UnityEngine;
 
-public class StageContoller : Controller
+public class StageContoller : MonoBehaviour, IController
 {
-    public void SearchNextState()
-    {
-        
-    }
+    
 }

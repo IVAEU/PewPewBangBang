@@ -12,13 +12,23 @@ public class PlayerInput : MonoBehaviour
         return _moveVector;
     }
 
-    public bool IsPrimaryAttackDown()
+    public bool IsPrimaryKeyDown()
     {
         return Input.GetKeyDown(KeyCode.Z);
     }
     
-    public bool IsPrimaryAttackUp()
+    public bool IsPrimaryKeyUp()
     {
         return Input.GetKeyUp(KeyCode.Z);
+    }
+    
+    public bool IsSecondaryKeyDown()
+    {
+        return Input.GetKeyDown(KeyCode.X);
+    }
+    
+    public bool IsSecondaryKeyUp()
+    {
+        return Input.GetKeyUp(KeyCode.X);
     }
 }

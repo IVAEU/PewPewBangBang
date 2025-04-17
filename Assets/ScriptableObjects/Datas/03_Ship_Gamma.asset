@@ -9,6 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f89ad1ae658ad7a47a52a0034ae9da02, type: 3}
-  m_Name: PlayerIdleState
+  m_Script: {fileID: 11500000, guid: 2a8f39b11f29de94fa3bc7c27fba91c9, type: 3}
+  m_Name: 03_Ship_Gamma
   m_EditorClassIdentifier: 
+  ShipName: Gamma
+  HealthPoint: 0
+  Speed: 0
+  AttackPower: 0
+  AttackSpeed: 0
+  ShipSprite: {fileID: 0}

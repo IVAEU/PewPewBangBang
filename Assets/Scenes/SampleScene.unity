@@ -498,14 +498,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6bd38debdd62af409a38200e17153fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Data: {fileID: 11400000, guid: 2b15df2b413b5634fb81863ca9a430d7, type: 2}
   Input: {fileID: 1130468984}
   Rigid2D: {fileID: 1130468983}
-  context:
-    CurrentState: {fileID: 0}
-  states:
-  - {fileID: 11400000, guid: bd191d9e243ad514fb7f7c2f6bce8542, type: 2}
-  - {fileID: 11400000, guid: 105a8131c2b144c46886867f8ff8c6d1, type: 2}
-  - {fileID: 11400000, guid: b1855c29ffdfd46449de5324f7393f75, type: 2}
 --- !u!4 &1130468986
 Transform:
   m_ObjectHideFlags: 0
