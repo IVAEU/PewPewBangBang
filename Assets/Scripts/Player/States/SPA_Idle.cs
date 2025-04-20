@@ -1,7 +1,7 @@
-using State;
 using UnityEngine;
+using State;
 
-public class SPL_Idle : IState<PlayerController>
+public class SPA_Idle : IState<PlayerController>
 {
     public void OnEnter(PlayerController controller)
     {
@@ -10,9 +10,9 @@ public class SPL_Idle : IState<PlayerController>
 
     public void OnProcessing(PlayerController controller)
     {
-        if (controller.Input.GetMoveVector() != Vector2.zero)
+        if (controller.Input.IsPrimaryKeyDown())
         {
-            controller.LocomotionStateMachine.ChangeState(PlayerController.LocomotionState.Move);
+            controller.AttackStateMachine.ChangeState(PlayerController.AttackState.Attack);
         }
     }
 

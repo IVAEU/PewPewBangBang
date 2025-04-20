@@ -1,37 +1,76 @@
-using System;
 using System.Linq;
+using Managers;
 using State;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour, IController
+public class PlayerController : Controller, IPoolObject
 {
-    public ShipData Data;
-    public PlayerInput Input;
-    public Rigidbody2D Rigid2D;
+    public enum LocomotionState
+    {
+        Idle,
+        Move
+    }
+    
+    public enum AttackState
+    {
+        Idle,
+        Attack
+    }
+    
+    public ShipData Data { get; private set; }
+    public HealthSystem Health { get; private set; }
+    public PlayerInput Input { get; private set; }
+    public Rigidbody2D Rigid2D { get; private set; }
+    public SpriteRenderer Renderer { get; private set; }
 
-    [field: SerializeField]
-    public Context<PlayerController> Context { get; private set; }
+    public StateMachine<LocomotionState, PlayerController> LocomotionStateMachine { get; private set; }
+    public StateMachine<AttackState, PlayerController> AttackStateMachine { get; private set; }
 
+    public void ConstructObject()
+    {
+        Data = DataManager.Instance.GetSelectedPlayerShipData();
+        Health = gameObject.AddComponent<HealthSystem>();
+        Health.Initialize(Data.HealthPoint);
+        Input = gameObject.AddComponent<PlayerInput>();
+        Rigid2D = gameObject.AddComponent<Rigidbody2D>();
+        Rigid2D.gravityScale = 0;
+        Renderer = gameObject.AddComponent<SpriteRenderer>();
+        Renderer.sprite = Data.ShipSprite;
+    }
+
+    public void DeconstructObject()
+    {
+        Destroy(Health);
+        Destroy(Input);
+        Destroy(Rigid2D);
+        Destroy(Renderer);
+    }
+    
     private void Start()
     {
-        Input = GetComponent<PlayerInput>();
-        Rigid2D = GetComponent<Rigidbody2D>();
-        Context = new Context<PlayerController>();
-        Context.Init(this);
-        Context.AddState(SubStateType.Locomotion, StateType.Idle, new SPL_Idle());
-        Context.AddState(SubStateType.Locomotion, StateType.Move, new SPL_Move());
-        Context.AddState(SubStateType.Behavior, StateType.Idle, new SPB_Idle());
-        Context.AddState(SubStateType.Behavior, StateType.Attack, new SPB_Shoot());
-
-        Context.ChangeState(SubStateType.Locomotion, StateType.Idle);
-        Context.ChangeState(SubStateType.Behavior, StateType.Idle);
+        LocomotionStateMachine = new ();
+        LocomotionStateMachine.Init(this);
+        LocomotionStateMachine.AddState(LocomotionState.Idle, new SPL_Idle());
+        LocomotionStateMachine.AddState(LocomotionState.Move, new SPL_Move());
+        
+        AttackStateMachine = new ();
+        AttackStateMachine.Init(this);
+        AttackStateMachine.AddState(AttackState.Idle, new SPA_Idle());
+        AttackStateMachine.AddState(AttackState.Attack, new SPA_Shoot());
+        
+        LocomotionStateMachine.ChangeState(LocomotionState.Idle);
+        AttackStateMachine.ChangeState(AttackState.Idle);
     }
 
     private void Update()
     {
-        foreach (var state in Context.CurrentState.ToList())
-        {
-            state.Value.OnProcessing(this);
-        }
+        LocomotionStateMachine.CurrentState.OnProcessing(this);
+        AttackStateMachine.CurrentState.OnProcessing(this);
+    }
+
+    private void OnDeath()
+    {
+        EventManager.Instance.ProcessEvent(GameEvent.Player_Death);
+        PoolManager.Instance.ReturnObject(this);
     }
 }

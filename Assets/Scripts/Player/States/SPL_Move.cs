@@ -14,7 +14,7 @@ public class SPL_Move : IState<PlayerController>
         
         if (controller.Input.GetMoveVector() == Vector2.zero)
         {
-            controller.Context.ChangeState(SubStateType.Locomotion, StateType.Idle);
+            controller.LocomotionStateMachine.ChangeState(PlayerController.LocomotionState.Idle);
         }
     }
 

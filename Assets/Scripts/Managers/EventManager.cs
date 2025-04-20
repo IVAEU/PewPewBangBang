@@ -30,8 +30,9 @@ namespace Managers
             _gameEvents[gameEvent] -= onEvent;
         }
 
-        public void ProcessEvent(GameEvent gameEvent, int value = 0)
+        public void ProcessEvent(GameEvent gameEvent)
         {
+            if(!_gameEvents.ContainsKey(gameEvent)) return;
             _gameEvents[gameEvent]?.Invoke();
         }
     }

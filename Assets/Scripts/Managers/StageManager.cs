@@ -5,8 +5,8 @@ using Utils;
 
 namespace Managers
 {
-    public class StageManager : Singleton<StageManager>
+    public class StageManager : TemporarySingleton<StageManager>
     {
-
+        
     }
 }

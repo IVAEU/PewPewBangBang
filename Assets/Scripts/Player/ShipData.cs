@@ -8,5 +8,7 @@ public class ShipData : ScriptableObject
     [field:SerializeField] public int Speed { get; private set; }
     [field:SerializeField] public int AttackPower { get; private set; }
     [field:SerializeField] public int AttackSpeed { get; private set; }
+    [field:SerializeField] public int MagazineSize { get; private set; }
+    [field:SerializeField] public float ReloadTime { get; private set; }
     [field:SerializeField] public Sprite ShipSprite { get; private set; }
 }
